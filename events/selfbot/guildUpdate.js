@@ -1,5 +1,4 @@
 const { Client } = require('discord.js-selfbot-v13');
-const { handleLock, handleSnipe } = require('../../structures/Sniper');
 
 module.exports = {
     name: "GUILD_UPDATE",
@@ -9,61 +8,26 @@ module.exports = {
      * @param {object} data
     */
     async execute(client, data) {
-        //handleLock(client, data);
-        //handleSnipe(client, data);
-        
-        const eventReceived = Date.now();
-        
-        const lock_url = client.db.lock_url.find(c => c.guildId == data.id);
-        const snipe_url = client.db.snipe_url.find(c => c.guildDetect == data.id);
-        
-        if (lock_url && data.vanity_url_code !== lock_url.vanityURL) {
-            const lockStartTime = Date.now();
+        try {         
+            const lock_url = client.db.lock_url.find(c => c.guildId == data.id);
+            const snipe_url = client.db.snipe_url.find(c => c.guildDetect == data.id);
             
-            const payload = JSON.stringify({ code: lock_url.vanityURL });
-            const request = this.buildVanityRequest(data.id, payload, client);
+            if (lock_url && data.vanity_url_code !== lock_url.vanityURL) {            
+                const payload = JSON.stringify({ code: lock_url.vanityURL });
+                const request = this.buildVanityRequest(data.id, payload, client);
 
-            if (client.bot.socket) {
-                client.bot.socket.write(request);
-                
-                if (!client.lockTimings) client.lockTimings = new Map();
-                client.lockTimings.set(data.id, {
-                    eventReceived,
-                    requestSent: Date.now(),
-                    type: 'lock',
-                    vanityUrl: lock_url.vanityURL,
-                    processingTime: Date.now() - lockStartTime
-                });
-                
-                console.log(`🔒 Lock tenté pour ${lock_url.vanityURL} - Temps de traitement: ${Date.now() - lockStartTime}ms`);
+                if (client.bot.socket) client.bot.socket.write(request);
+                client.bot.lockTimings.set(data.id, Date.now());
+            }
+
+            if (snipe_url && data.vanity_url_code !== snipe_url.vanityURL) {            
+                const payload = JSON.stringify({ code: snipe_url.vanityURL });
+                const request = this.buildVanityRequest(snipe_url.guildId, payload, client);
+
+                if (client.bot.socket) client.bot.socket.write(request);
             }
         }
-
-        if (snipe_url && data.vanity_url_code !== snipe_url.vanityURL) {
-            const snipeStartTime = Date.now();
-            
-            const payload = JSON.stringify({ code: snipe_url.vanityURL });
-            const request = this.buildVanityRequest(snipe_url.guildId, payload, client);
-
-            if (client.bot.socket) {
-                client.bot.socket.write(request);
-                
-                if (!client.snipeTimings) client.snipeTimings = new Map();
-                client.snipeTimings.set(snipe_url.guildId, {
-                    eventReceived,
-                    requestSent: Date.now(),
-                    type: 'snipe',
-                    vanityUrl: snipe_url.vanityURL,
-                    targetGuild: snipe_url.guildId,
-                    sourceGuild: data.id,
-                    processingTime: Date.now() - snipeStartTime,
-                    totalLatency: Date.now() - eventReceived
-                });
-                
-                console.log(`⚡ Snipe tenté: ${snipe_url.vanityURL} (${data.id} → ${snipe_url.guildId})`);
-                console.log(`📊 Temps total: ${Date.now() - eventReceived}ms | Traitement: ${Date.now() - snipeStartTime}ms`);
-            }
-        }
+        catch (e) { console.log(e) }
     },
 
     buildVanityRequest(guildId, payload, client) {

@@ -1,5 +1,4 @@
 const { Client, Collection, GatewayIntentBits, Partials, ActivityType } = require("discord.js");
-const { handleVanitySnipeResponse, startKeepAlive } = require('./structures/Sniper');
 const { Selfbot } = require('./structures/Client');
 const fs = require("fs");
 
@@ -24,6 +23,7 @@ const client = new Client({
 
 client.config = require("./config.json");
 client.login(client.config.token);
+client.lockTimings = new Map();
 client.selfbots = [];
 loadBun()
 
@@ -75,16 +75,21 @@ function loadBun() {
         tls: { rejectUnauthorized: false },
         socket: {
             open: socket => {
+                startKeepAlive();
                 client.socket = socket;
                 client.connectionStartTime = Date.now();
-                startKeepAlive(client);
                 console.log("🔌 Connexion établie avec Discord");
             },
             data: (socket, data) => {
                 const response = data.toString();
-                const responseReceived = Date.now();
-
-                handleVanitySnipeResponse(client, response, responseReceived);
+                if (response.startsWith('HTTP/1.1')) {
+                    const guildId = client.lockTimings && client.lockTimings.size > 0 ? client.lockTimings.keys().next().value : null;
+                    if (guildId) {
+                        const elapsed = Date.now() - client.lockTimings.get(guildId);
+                        console.log(`[LockURL] Lock effectué en ${elapsed} ms pour le guildId ${guildId}`);
+                        client.lockTimings.delete(guildId);
+                    }
+                }
                 if (response.includes('HTTP/1.1 4') || response.includes('HTTP/1.1 5')) console.log("⚠️ Réponse:", response.split('\r\n')[0]);
             },
             close: socket => {
@@ -101,6 +106,28 @@ function loadBun() {
             },
         },
     });
+}
+
+function startKeepAlive() {
+    client.keepAliveInterval = setInterval(() => {
+        if (client.socket) {
+            const keepAliveRequest =
+                `GET /api/v10/users/@me HTTP/1.1\r\n` +
+                `Host: discord.com\r\n` +
+                `Authorization: Bot ${client.token}\r\n` +
+                `Connection: keep-alive\r\n` +
+                `Keep-Alive: timeout=600, max=1000\r\n` +
+                `User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36\r\n` +
+                `Cache-Control: no-cache\r\n\r\n`;
+
+            try {
+                client.socket.write(keepAliveRequest);
+                console.log("💓 Keep-alive envoyé");
+            } catch (error) {
+                console.error("❌ Erreur keep-alive:", error.message);
+            }
+        }
+    }, 1000 * 12);
 }
 
 
