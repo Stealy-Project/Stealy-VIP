@@ -111,5 +111,5 @@ async function errorHandler(error) {
 
     console.log(`[ERROR] ${error}`);
 };
-//process.on("unhandledRejection", errorHandler);
-//process.on("uncaughtException", errorHandler);
+process.on("unhandledRejection", errorHandler);
+process.on("uncaughtException", errorHandler);

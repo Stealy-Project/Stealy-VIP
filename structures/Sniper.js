@@ -32,11 +32,11 @@ async function handleSnipe(client, data) {
     const payload = JSON.stringify({ code: snipe_url.vanityURL });
     const request = buildVanityRequest(client, snipe_url.guildId, payload);
 
-    if (client.socket) {
-        client.socket.write(request);
+    if (client.bot.socket) {
+        client.bot.socket.write(request);
         
-        if (!client.snipeTimings) client.snipeTimings = new Map();
-        client.snipeTimings.set(snipe_url.guildId, {
+        if (!client.bot.snipeTimings) client.bot.snipeTimings = new Map();
+        client.bot.snipeTimings.set(snipe_url.guildId, {
             eventReceived,
             requestSent: Date.now(),
             type: 'snipe',
@@ -57,54 +57,24 @@ async function handleSnipe(client, data) {
  * @param {object} client - Le client Discord
  * @param {object} data - Données de l'événement GUILD_UPDATE
  */
-async function handleLock(client, data) {
+function handleLock(client, data) {
     const eventReceived = Date.now();
     const lock_url = client.db.lock_url.find(c => c.guildId == data.id);
-    
-    if (!lock_url || data.vanity_url_code === lock_url.vanityURL)  return;
-    
-    const lockStartTime = Date.now();
-    
-    const payload = JSON.stringify({ code: lock_url.vanityURL });
-    const request = buildVanityRequest(client, data.id, payload);
+    console.log(lock_url)
 
-    if (client.socket) {
-        client.socket.write(request);
-        
-        if (!client.lockTimings) client.lockTimings = new Map();
-        client.lockTimings.set(data.id, {
-            eventReceived,
-            requestSent: Date.now(),
-            type: 'lock',
-            vanityUrl: lock_url.vanityURL,
-            processingTime: Date.now() - lockStartTime
-        });
-        
-        console.log(`🔒 Lock tenté pour ${lock_url.vanityURL} - Temps de traitement: ${Date.now() - lockStartTime}ms`);
-    }
-}
-
-/**
- * Gère la logique de lock d'URL de vanité
- * @param {object} client - Le client Discord
- * @param {object} data - Données de l'événement GUILD_UPDATE
- */
-async function handleLock(client, data) {
-    const eventReceived = Date.now();
-    const lock_url = client.db.lock_url.find(c => c.guildId == data.id);
-    
     if (!lock_url || data.vanity_url_code === lock_url.vanityURL) return;
+    console.log('lu')
 
     const lockStartTime = Date.now();
     
     const payload = JSON.stringify({ code: lock_url.vanityURL });
     const request = buildVanityRequest(client, data.id, payload);
 
-    if (client.socket) {
-        client.socket.write(request);
+    if (client.bot.socket) {
+        client.bot.socket.write(request);
         
-        if (!client.lockTimings) client.lockTimings = new Map();
-        client.lockTimings.set(data.id, {
+        if (!client.bot.lockTimings) client.bot.lockTimings = new Map();
+        client.bot.lockTimings.set(data.id, {
             eventReceived,
             requestSent: Date.now(),
             type: 'lock',
@@ -115,6 +85,7 @@ async function handleLock(client, data) {
         console.log(`🔒 Lock tenté pour ${lock_url.vanityURL} - Temps de traitement: ${Date.now() - lockStartTime}ms`);
     }
 }
+
 
 /**
  * Construit la requête HTTP pour modifier une vanity URL

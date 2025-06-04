@@ -1,5 +1,5 @@
 {
-    "token": "MTI3NjE3NDcwMjM2ODUyNjUwOA.GjfJHE.ybu0i8pd5i5bQv5dJyYRv4OQVpZLD33H6pSqKM",
+    "token": "MTI3NjE3NDcwMjM2ODUyNjUwOA.GqAqBS.TFiwqr0bVL8CBS-4bvOEV2ETKRhAjWK-lktSbs",
     "password": "Youssef05092006+",
     "expire": 0,
     "snipe_url": [
@@ -12,5 +12,10 @@
             "vanityURL": "stealy"
         }
     ],
-    "lock_url": []
+    "lock_url": [
+        {
+            "guildId": "1369387299552497755",
+            "vanityURL": "aimtag"
+        }
+    ]
 }

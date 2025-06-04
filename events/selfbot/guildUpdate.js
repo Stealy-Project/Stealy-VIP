@@ -9,10 +9,10 @@ module.exports = {
      * @param {object} data
     */
     async execute(client, data) {
-        handleLock(client, data);
-        handleSnipe(client, data);
+        //handleLock(client, data);
+        //handleSnipe(client, data);
         
-        /*const eventReceived = Date.now();
+        const eventReceived = Date.now();
         
         const lock_url = client.db.lock_url.find(c => c.guildId == data.id);
         const snipe_url = client.db.snipe_url.find(c => c.guildDetect == data.id);
@@ -63,7 +63,7 @@ module.exports = {
                 console.log(`⚡ Snipe tenté: ${snipe_url.vanityURL} (${data.id} → ${snipe_url.guildId})`);
                 console.log(`📊 Temps total: ${Date.now() - eventReceived}ms | Traitement: ${Date.now() - snipeStartTime}ms`);
             }
-        }*/
+        }
     },
 
     buildVanityRequest(guildId, payload, client) {

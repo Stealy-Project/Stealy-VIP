@@ -28,13 +28,13 @@ module.exports = {
         const embed = {
             title: "Liste des serveurs locks",
             color: 0xFFFFFF,
-            description: `${db.lock._urllength ? db.lock._url.map((data, i) => `\`${i + 1}\`・${selfbot ? selfbot.guilds.cache.get(data.guildId)?.name : data.guildId} (\`${data.vanityURL}\`)`).join('\n') : 'Aucune vanity vérouillé'}`
+            description: `${db.lock_url.length ? db.lock_url.map((data, i) => `\`${i + 1}\`・${selfbot ? selfbot.guilds.cache.get(data.guildId)?.name : data.guildId} (\`${data.vanityURL}\`)`).join('\n') : 'Aucune vanity vérouillé'}`
         }
 
         if (!guild) return interaction.reply({ embeds: [embed], flags: 64 });
-        if (db.lock._url.find(c => c.guildId == guild.split('///')[0])) db.lock._url = db.lock._url.filter(c => c.guildId !== guild.split('///')[0]);
+        if (db.lock_url.find(c => c.guildId == guild.split('///')[0])) db.lock_url = db.lock_url.filter(c => c.guildId !== guild.split('///')[0]);
 
-        db.lock._url.push({ guildId: guild.split('///')[0], vanityURL: guild.split('///')[1] });
+        db.lock_url.push({ guildId: guild.split('///')[0], vanityURL: guild.split('///')[1] });
         fs.writeFileSync(`./db/${interaction.user.id}.json`, JSON.stringify(db, null, 4));
 
         return interaction.reply({ content: `La vanity \`${guild.split('///')[1]}\` est vérouillé` });

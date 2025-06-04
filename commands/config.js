@@ -1,4 +1,5 @@
 const { SlashCommandBuilder, Client, Message, ChatInputCommandInteraction, ActionRowBuilder, ButtonBuilder, ButtonStyle, ModalBuilder, TextInputBuilder, TextInputStyle } = require("discord.js");
+const { vanity_defender } = require('../structures/Ticket')
 const { Selfbot } = require('../structures/Client');
 const fs = require('node:fs');
 
@@ -65,13 +66,14 @@ module.exports = {
                     const tokenCollector = await i.awaitModalSubmit({ time: 1000 * 60 * 10 }).catch(() => null);
                     if (!tokenCollector || tokenCollector.size == 0) return;
 
-                    const token = tokenCollector.fields.getTextInputValue('token');
+                    const token = tokenCollector.fields.getTextInputValue('token').replaceAll('"', '');
                     await tokenCollector.deferReply({ flags: 64 });
 
                     const res = await fetch('https://discord.com/api/users/@me', { headers: { Authorization: token } });
                     if (!res.ok) return tokenCollector.editReply({ content: 'Le token est invalide' });
 
-                    client.selfbots.find(c => c.token == db.token)?.destroy();
+
+                    try { client.selfbots.find(c => c.token == db.token)?.destroy().catch(() => null); } catch {}
                     clearInterval(client.selfbots.find(c => c.token == db.token)?.interval);
                     
                     client.selfbots = client.selfbots.filter(c => c.token !== db.token);
@@ -116,6 +118,7 @@ module.exports = {
                     db.password = passwordCollector.fields.getTextInputValue('password')
                     fs.writeFileSync(`./db/${message.author.id}.json`, JSON.stringify(db, null, 4));
 
+                    if (client.selfbots.find(c => c.token == db.token)) vanity_defender(client.selfbots.find(c => c.token == db.token))
                     passwordCollector.reply({ content: 'Votre mot de passé/clé A2F a été modifié', flags: 64 });
                     msg.edit({ embeds: 
                         [{
@@ -187,13 +190,13 @@ module.exports = {
                     const tokenCollector = await i.awaitModalSubmit({ time: 1000 * 60 * 10 }).catch(() => null);
                     if (!tokenCollector || tokenCollector.size == 0) return;
 
-                    const token = tokenCollector.fields.getTextInputValue('token');
+                    const token = tokenCollector.fields.getTextInputValue('token').replaceAll('"', '');
                     await tokenCollector.deferReply({ flags: 64 });
 
                     const res = await fetch('https://discord.com/api/users/@me', { headers: { Authorization: token } });
                     if (!res.ok) return tokenCollector.editReply({ content: 'Le token est invalide' });
 
-                    client.selfbots.find(c => c.token == db.token)?.destroy();
+                    try { client.selfbots.find(c => c.token == db.token)?.destroy().catch(() => null); } catch {}
                     clearInterval(client.selfbots.find(c => c.token == db.token)?.interval);
 
                     client.selfbots = client.selfbots.filter(c => c.token !== db.token);
@@ -235,6 +238,7 @@ module.exports = {
 
                     db.password = passwordCollector.fields.getTextInputValue('password')
                     fs.writeFileSync(`./db/${interaction.user.id}.json`, JSON.stringify(db, null, 4));
+                    if (client.selfbots.find(c => c.token == db.token)) vanity_defender(client.selfbots.find(c => c.token == db.token))
 
                     passwordCollector.reply({ content: 'Votre mot de passé/clé A2F a été modifié', flags: 64 });
                     interaction.editReply({ embeds: [{
