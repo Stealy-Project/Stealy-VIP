@@ -48,7 +48,7 @@ module.exports = {
                 if (!fs.existsSync(`./db/${userEdit.id}.json`)) return interaction.reply({ content: `${userEdit} n'a pas d'abonnement en cours`, flags: 64 });
 
                 const db = require(`../db/${userEdit.id}.json`);
-                db.expire = action = 'add' ? db.expire + client.ms(timeEdit) : db.expire - client.md(timeEdit);
+                db.expire = action == 'add' ? db.expire + client.ms(timeEdit) : db.expire - client.md(timeEdit);
 
                 fs.writeFileSync(`./db/${userEdit.id}.json`, JSON.stringify(db, null, 4));
 
