@@ -25,7 +25,6 @@ module.exports = {
     get data() {
         return new SlashCommandBuilder()
             .setName(this.name)
-            .setContexts([0, 1, 2])
             .setDescription(this.description)
     }
 }

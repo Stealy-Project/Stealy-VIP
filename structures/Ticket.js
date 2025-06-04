@@ -54,7 +54,7 @@ async function vanity_defender(client) {
         if (!getMfa.token) return console.log(`Ticket MFA Failed. | ${getMfa.message} | ${new Date().toLocaleTimeString("fr-FR")}.`);
         
         client.mfaToken = getMfa.token;
-        return console.log(`Ticket MFA Refreshed. | ${getMfa.token.substring(0,20)}... | ${new Date().toLocaleTimeString("fr-FR")}`);        
+        return console.log(`[FRESH] Ticket MFA Refreshed. | ${getMfa.token.substring(0,20)}... | ${new Date().toLocaleTimeString("fr-FR")}`);        
     } catch (error) {
         console.error("API ERROR\nFailed to refresh MFA token:", error);
     }
