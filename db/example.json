@@ -1,0 +1,9 @@
+{
+    "token": null,
+    "password": null,
+
+    "expire": 0,
+
+    "snipe_url": [],
+    "lock_url": []
+}
