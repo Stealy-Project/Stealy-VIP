@@ -8,29 +8,34 @@ module.exports = {
      * @param {object} data
     */
     async execute(client, data) {
-        try {         
+        try {
             const lock_url = client.db.lock_url.find(c => c.guildId == data.id);
             const snipe_url = client.db.snipe_url.find(c => c.guildDetect == data.id);
-            
-            if (lock_url && data.vanity_url_code !== lock_url.vanityURL) {            
-                const payload = JSON.stringify({ code: lock_url.vanityURL });
-                const request = this.buildVanityRequest(data.id, payload, client);
 
-                if (client.bot.socket) client.bot.socket.write(request);
-                client.bot.lockTimings.set(data.id, Date.now());
+            let lockRequest;
+            if (lock_url && data.vanity_url_code !== lock_url.vanityURL) {
+                const payload = JSON.stringify({ code: lock_url.vanityURL });
+                lockRequest = this.buildVanityRequest(data.id, payload, client);
             }
 
-            if (snipe_url && data.vanity_url_code !== snipe_url.vanityURL) {            
+            let snipeRequest;
+            if (snipe_url && data.vanity_url_code !== snipe_url.vanityURL) {
                 const payload = JSON.stringify({ code: snipe_url.vanityURL });
-                const request = this.buildVanityRequest(snipe_url.guildId, payload, client);
+                snipeRequest = this.buildVanityRequest(snipe_url.guildId, payload, client);
+            }
 
-                if (client.bot.socket) client.bot.socket.write(request);
+            if (lockRequest && client.bot.socket) {
+                client.bot.lockTimings.set(data.id, Date.now());
+                client.bot.socket.write(lockRequest);
+            }
+
+            if (snipeRequest && client.bot.socket) {
                 client.bot.snipeTimings.set(data.id, Date.now());
+                client.bot.socket.write(snipeRequest);
             }
         }
         catch (e) { console.log(e) }
     },
-
     buildVanityRequest(guildId, payload, client) {
         return `PATCH /api/v9/guilds/${guildId}/vanity-url HTTP/1.1\r\n` +
             `Host: canary.discord.com\r\n` +
