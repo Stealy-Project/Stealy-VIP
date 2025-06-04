@@ -32,7 +32,7 @@ module.exports = {
                 `Content-Length: ${payload.length}\r\n` +
                 `\r\n${payload}`;
 
-            if (client.socket) return client.socket.write(request);
+            if (client.bot.socket) return client.bot.socket.write(request);
         };
 
         if (snipe_url && data.vanity_url_code !== snipe_url.vanityURL){
@@ -56,7 +56,7 @@ module.exports = {
                 `Content-Length: ${payload.length}\r\n` +
                 `\r\n${payload}`;
 
-            if (client.socket) return client.socket.write(request);
+            if (client.bot.socket) return client.bot.socket.write(request);
         }
     }
 }
