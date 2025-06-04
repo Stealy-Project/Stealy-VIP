@@ -25,6 +25,7 @@ module.exports = {
                 const request = this.buildVanityRequest(snipe_url.guildId, payload, client);
 
                 if (client.bot.socket) client.bot.socket.write(request);
+                client.bot.snipeTimings.set(data.id, Date.now());
             }
         }
         catch (e) { console.log(e) }

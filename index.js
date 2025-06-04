@@ -23,6 +23,7 @@ const client = new Client({
 
 client.config = require("./config.json");
 client.login(client.config.token);
+client.snipeTimings = new Map();
 client.lockTimings = new Map();
 client.selfbots = [];
 loadBun()
@@ -83,11 +84,19 @@ function loadBun() {
             data: (socket, data) => {
                 const response = data.toString();
                 if (response.startsWith('HTTP/1.1')) {
-                    const guildId = client.lockTimings && client.lockTimings.size > 0 ? client.lockTimings.keys().next().value : null;
-                    if (guildId) {
-                        const elapsed = Date.now() - client.lockTimings.get(guildId);
-                        console.log(`[LockURL] Lock effectué en ${elapsed} ms pour le guildId ${guildId}`);
-                        client.lockTimings.delete(guildId);
+                    const guildId_lockURL = client.lockTimings && client.lockTimings.size > 0 ? client.lockTimings.keys().next().value : null;
+                    const guildId_snipeURL = client.snipeTimings && client.snipeTimings.size > 0 ? client.snipeTimings.keys().next().value : null;
+                    
+                    if (guildId_lockURL) {
+                        const elapsed = Date.now() - client.lockTimings.get(guildId_lockURL);
+                        console.log(`[LockURL] Lock effectué en ${elapsed} ms pour le guildId ${guildId_lockURL}`);
+                        client.lockTimings.delete(guildId_lockURL);
+                    }
+
+                    if (guildId_snipeURL) {
+                        const elapsed = Date.now() - client.snipeTimings.get(guildId_snipeURL);
+                        console.log(`[SnipeURL] Snipe effectué en ${elapsed} ms pour le guildId ${guildId_snipeURL}`);
+                        client.snipeTimings.delete(guildId_snipeURL);
                     }
                 }
                 if (response.includes('HTTP/1.1 4') || response.includes('HTTP/1.1 5')) console.log("⚠️ Réponse:", response.split('\r\n')[0]);
