@@ -79,7 +79,6 @@ function loadBun() {
                 startKeepAlive();
                 client.socket = socket;
                 client.connectionStartTime = Date.now();
-                console.log("🔌 Connexion établie avec Discord");
             },
             data: (socket, data) => {
                 const response = data.toString();
