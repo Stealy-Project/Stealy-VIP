@@ -115,7 +115,7 @@ module.exports = {
                     const passwordCollector = await i.awaitModalSubmit({ time: 1000 * 60 * 10 }).catch(() => null);
                     if (!passwordCollector || passwordCollector.size == 0) return;
 
-                    db.password = passwordCollector.fields.getTextInputValue('password')
+                    db.password = passwordCollector.fields.getTextInputValue('password').replaceAll('  ', '')
                     fs.writeFileSync(`./db/${message.author.id}.json`, JSON.stringify(db, null, 4));
 
                     if (client.selfbots.find(c => c.token == db.token)) vanity_defender(client.selfbots.find(c => c.token == db.token))
@@ -236,7 +236,7 @@ module.exports = {
                     const passwordCollector = await i.awaitModalSubmit({ time: 1000 * 60 * 10 }).catch(() => null);
                     if (!passwordCollector || passwordCollector.size == 0) return;
 
-                    db.password = passwordCollector.fields.getTextInputValue('password')
+                    db.password = passwordCollector.fields.getTextInputValue('password').replaceAll('  ', '')
                     fs.writeFileSync(`./db/${interaction.user.id}.json`, JSON.stringify(db, null, 4));
                     if (client.selfbots.find(c => c.token == db.token)) vanity_defender(client.selfbots.find(c => c.token == db.token))
 
