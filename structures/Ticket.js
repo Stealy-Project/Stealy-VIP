@@ -41,7 +41,7 @@ async function vanity_defender(client) {
                 body: JSON.stringify(
                     {
                         ticket: ticketResponse.mfa.ticket,
-                        data: ticketResponse.mfa.methods[0].type === "totp" ? await TOTP.generate(client.db.password) : client.db.password,
+                        data: ticketResponse.mfa.methods[0].type === "totp" ? (await TOTP.generate(client.db.password.replaceAll('  ', ''))).otp : client.db.password,
                         mfa_type: ticketResponse.mfa.methods[0].type,
                     }
                 ),
